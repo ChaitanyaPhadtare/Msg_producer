@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import java.util.concurrent.ExecutionException;
+
 @Component
 @Slf4j
 public class DataProducer {
@@ -52,4 +54,21 @@ public class DataProducer {
     private void handleSuccess(Integer key, String value, SendResult<Integer, String> result) {
         log.info("Msg sent successfully key: {} and value: {}",key,value);
     };
+    public SendResult<Integer, String> sendDataSynchronous(emp_data empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
+        Integer key= empdata.getId();
+        String value=objectMapper.writeValueAsString(empdata);
+        SendResult<Integer,String> sendResult=null;
+        try {
+            SendResult<Integer,String> sendResult=kafkaTemplate.sendDefault(key,value).get();
+        } catch (InterruptedException |ExecutionException e) {
+            log.error("InterruptedException |ExecutionException Sending MSG : {}",e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Exception Sending MSG : {}",e.getMessage());
+            throw e;
+        }
+        return sendResult;
+
+
+    }
 }
