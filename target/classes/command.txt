@@ -1,0 +1,5 @@
+curl -i -d '{"id":456,"name":"Dilip"}}' -H "Content-Type: application/json" -X POST http://localhost:8080/em
+
+    admin:
+      properties:
+        bootstrap_servers: localhost:9092
