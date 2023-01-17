@@ -25,8 +25,9 @@ public class DataController {
     public ResponseEntity<emp_data> postInfo(@RequestBody emp_data empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
         log.info("before sending data");
        // dataProducer.sendData(empdata);
-        SendResult<Integer, String> sendResult=dataProducer.sendDataSynchronous(empdata);
-        log.info("Sendresult is {}",sendResult.toString());
+        //SendResult<Integer, String> sendResult=dataProducer.sendDataSynchronous(empdata);
+        dataProducer.sendDataapproch2(empdata);
+        //log.info("Sendresult is {}",sendResult.toString());
         log.info("after sending data");
         return ResponseEntity.status(HttpStatus.CREATED).body(empdata);
 

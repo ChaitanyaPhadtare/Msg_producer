@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kafka_producer.Employee.emp_data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -21,6 +22,8 @@ public class DataProducer {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    String topic="employeedata";
 
     public void sendData(emp_data empdata) throws JsonProcessingException {
         Integer key= empdata.getId();
@@ -55,20 +58,45 @@ public class DataProducer {
         log.info("Msg sent successfully key: {} and value: {}",key,value);
     };
     public SendResult<Integer, String> sendDataSynchronous(emp_data empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
-        Integer key= empdata.getId();
-        String value=objectMapper.writeValueAsString(empdata);
-        SendResult<Integer,String> sendResult=null;
+        Integer key = empdata.getId();
+        String value = objectMapper.writeValueAsString(empdata);
+
+        SendResult<Integer, String> sendResult;
         try {
-            SendResult<Integer,String> sendResult=kafkaTemplate.sendDefault(key,value).get();
-        } catch (InterruptedException |ExecutionException e) {
-            log.error("InterruptedException |ExecutionException Sending MSG : {}",e.getMessage());
+            sendResult = kafkaTemplate.sendDefault(key, value).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("InterruptedException |ExecutionException Sending MSG : {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Exception Sending MSG : {}",e.getMessage());
+            log.error("Exception Sending MSG : {}", e.getMessage());
             throw e;
         }
         return sendResult;
 
 
+    }
+    public void sendDataapproch2(emp_data empdata) throws JsonProcessingException {
+        Integer key= empdata.getId();
+        String value=objectMapper.writeValueAsString(empdata);
+        ProducerRecord<Integer,String> producerRecord=buildproducerrecord(key,value,topic);
+        ListenableFuture<SendResult<Integer,String>> listenableFuture= kafkaTemplate.send(producerRecord);
+        listenableFuture.addCallback(new ListenableFutureCallback<SendResult<Integer, String>>() {
+            @Override
+
+            public void onFailure(Throwable ex) {
+                handleFailure(key,value,ex);
+
+            }
+
+            @Override
+            public void onSuccess(SendResult<Integer, String> result) {
+                handleSuccess(key,value,result);
+            }
+
+        });
+    }
+
+    private ProducerRecord<Integer, String> buildproducerrecord(Integer key, String value, String topic) {
+        return new ProducerRecord<>(topic, key, value);
     }
 }
