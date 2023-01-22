@@ -1,14 +1,12 @@
 package com.kafka_producer.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.kafka_producer.Employee.emp_data;
+import com.kafka_producer.Model.Employee;
 import com.kafka_producer.producer.DataProducer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +20,7 @@ public class DataController {
     DataProducer dataProducer;
 
     @PostMapping("/em")
-    public ResponseEntity<emp_data> postInfo(@RequestBody emp_data empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public ResponseEntity<Employee> postInfo(@RequestBody Employee empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
         log.info("before sending data");
        // dataProducer.sendData(empdata);
         //SendResult<Integer, String> sendResult=dataProducer.sendDataSynchronous(empdata);

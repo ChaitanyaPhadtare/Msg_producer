@@ -2,7 +2,7 @@ package com.kafka_producer.producer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kafka_producer.Employee.emp_data;
+import com.kafka_producer.Model.Employee;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class DataProducer {
 
     String topic="employeedata";
 
-    public void sendData(emp_data empdata) throws JsonProcessingException {
+    public void sendData(Employee empdata) throws JsonProcessingException {
         Integer key= empdata.getId();
         String value=objectMapper.writeValueAsString(empdata);
         ListenableFuture<SendResult<Integer,String>> listenableFuture= kafkaTemplate.sendDefault(key,value);
@@ -57,7 +57,7 @@ public class DataProducer {
     private void handleSuccess(Integer key, String value, SendResult<Integer, String> result) {
         log.info("Msg sent successfully key: {} and value: {}",key,value);
     };
-    public SendResult<Integer, String> sendDataSynchronous(emp_data empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
+    public SendResult<Integer, String> sendDataSynchronous(Employee empdata) throws JsonProcessingException, ExecutionException, InterruptedException {
         Integer key = empdata.getId();
         String value = objectMapper.writeValueAsString(empdata);
 
@@ -75,7 +75,7 @@ public class DataProducer {
 
 
     }
-    public void sendDataapproch2(emp_data empdata) throws JsonProcessingException {
+    public void sendDataapproch2(Employee empdata) throws JsonProcessingException {
         Integer key= empdata.getId();
         String value=objectMapper.writeValueAsString(empdata);
         ProducerRecord<Integer,String> producerRecord=buildproducerrecord(key,value,topic);
